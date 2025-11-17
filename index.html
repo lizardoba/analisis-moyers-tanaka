@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analisis Moyers y Tanaka & Johnston</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 1200px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 { font-size: 2em; margin-bottom: 10px; }
+    .header p { opacity: 0.9; }
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      padding: 30px;
+    }
+    .card {
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 10px;
+      border-left: 5px solid #667eea;
+    }
+    .card h2 { color: #333; margin-bottom: 15px; font-size: 1.3em; }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 1em;
+      transition: border-color 0.3s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    .results {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 15px;
+      border: 2px solid #e0e0e0;
+    }
+    .result-item {
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .moyers { background: #e3f2fd; color: #1565c0; border-left: 4px solid #1565c0; }
+    .tanaka { background: #f3e5f5; color: #6a1b9a; border-left: 4px solid #6a1b9a; }
+    .positive { background: #c8e6c9; color: #2e7d32; border-left: 4px solid #2e7d32; }
+    .negative { background: #ffccbc; color: #d84315; border-left: 4px solid #d84315; }
+    .table-section {
+      grid-column: 1 / -1;
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 10px;
+      border-left: 5px solid #764ba2;
+    }
+    .table-section h2 { color: #333; margin-bottom: 15px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #667eea;
+      color: white;
+      font-weight: bold;
+    }
+    tr:hover { background: #f5f5f5; }
+    .value-display {
+      font-size: 1.1em;
+      font-weight: bold;
+      padding: 8px 15px;
+      background: white;
+      border-radius: 5px;
+    }
+    @media (max-width: 768px) {
+      .content { grid-template-columns: 1fr; }
+      .header h1 { font-size: 1.5em; }
+      .table-section { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Analisis de Moyers y Tanaka & Johnston</h1>
+      <p>Prediccion de espacio en denticion mixta - Herramienta para ortodoncistas</p>
+    </div>
+    <div class="content">
+      <div class="card">
+        <h2>Datos del Analisis</h2>
+        <div class="form-group">
+          <label>Suma de incisivos inferiores (mm):</label>
+          <input type="number" id="inci_mm" step="0.1" placeholder="Ej: 24.5" min="20">
+        </div>
+        <div class="form-group">
+          <label>Sexo del paciente:</label>
+          <select id="sexo">
+            <option value="varon">Varon</option>
+            <option value="mujer">Mujer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Arcada a analizar:</label>
+          <select id="arcada">
+            <option>Superior</option>
+            <option>Inferior</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Espacio disponible en modelo (mm):</label>
+          <input type="number" id="espacio_modelo" step="0.1" placeholder="Ej: 17.8">
+        </div>
+        <button onclick="calcular()">Calcular Analisis</button>
+        <div id="resultados"></div>
+      </div>
+      <div class="card">
+        <h2>Instrucciones</h2>
+        <div style="line-height: 1.8; color: #555; font-size: 0.95em;">
+          <p><strong>1.</strong> Mide el ancho mesio-distal de los 4 incisivos inferiores permanentes (31, 32, 41, 42).</p>
+          <p><strong>2.</strong> Suma los valores y colacalo en el campo superior.</p>
+          <p><strong>3.</strong> Selecciona el sexo y arcada a analizar.</p>
+          <p><strong>4.</strong> Mide el espacio disponible desde la alineacion virtual de incisivos hasta el inicio del molar permanente en el modelo.</p>
+          <p><strong>5.</strong> Haz clic en calcular y obtén los resultados de ambos métodos.</p>
+          <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+          <p><strong>Interpretacion:</strong></p>
+          <p><strong style="color: #2e7d32;">Positivo:</strong> Hay espacio suficiente</p>
+          <p><strong style="color: #d84315;">Negativo:</strong> Hay apiñamiento</p>
+        </div>
+      </div>
+      <div class="table-section">
+        <h2>Tabla Moyers - Percentil 75%</h2>
+        <table>
+          <tr>
+            <th>Suma Inc. Inf.</th>
+            <th>Sup. Varon</th>
+            <th>Sup. Mujer</th>
+            <th>Inf. Varon</th>
+            <th>Inf. Mujer</th>
+          </tr>
+          <tr><td>22.0</td><td>19.2</td><td>18.0</td><td>18.7</td><td>18.0</td></tr>
+          <tr><td>23.0</td><td>20.6</td><td>19.2</td><td>19.8</td><td>19.2</td></tr>
+          <tr><td>24.0</td><td>21.8</td><td>20.4</td><td>20.9</td><td>20.4</td></tr>
+          <tr><td>24.5</td><td>22.8</td><td>21.0</td><td>22.5</td><td>21.8</td></tr>
+          <tr><td>25.0</td><td>23.3</td><td>21.5</td><td>23.0</td><td>22.3</td></tr>
+          <tr><td>25.5</td><td>24.6</td><td>22.8</td><td>24.2</td><td>23.5</td></tr>
+          <tr><td>26.0</td><td>25.4</td><td>23.8</td><td>25.0</td><td>24.4</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script>
+    const moyers = {
+      "varon": {
+        "Superior": {22:19.2,23:20.6,24:21.8,24.5:22.8,25:23.3,25.5:24.6,26:25.4},
+        "Inferior": {22:18.7,23:19.8,24:20.9,24.5:22.5,25:23.0,25.5:24.2,26:25.0}
+      },
+      "mujer": {
+        "Superior": {22:18.0,23:19.2,24:20.4,24.5:21.0,25:21.5,25.5:22.8,26:23.8},
+        "Inferior": {22:18.0,23:19.2,24:20.4,24.5:21.8,25:22.3,25.5:23.5,26:24.4}
+      }
+    };
+    function interpolar(val, obj) {
+      let keys = Object.keys(obj).map(Number).sort((a,b)=>a-b);
+      if (obj[val]) return obj[val];
+      for (let i=1; i<keys.length; i++) {
+        if (val < keys[i]) {
+          let x1=keys[i-1],x2=keys[i],y1=obj[x1],y2=obj[x2];
+          return y1+(y2-y1)*(val-x1)/(x2-x1);
+        }
+      }
+      return obj[keys[keys.length-1]];
+    }
+    function calcular(){
+      let suma=parseFloat(document.getElementById('inci_mm').value);
+      let sexo=document.getElementById('sexo').value;
+      let arcada=document.getElementById('arcada').value;
+      let modelo=parseFloat(document.getElementById('espacio_modelo').value);
+      if(!suma || isNaN(suma)) {
+        alert('Por favor ingresa la suma de incisivos inferiores');
+        return;
+      }
+      let resultado="<div class='results'>";
+      let espacioMoyers = interpolar(suma, moyers[sexo][arcada]);
+      resultado += `<div class="result-item moyers"><span>Moyers (${arcada})</span><span class="value-display">${espacioMoyers.toFixed(1)} mm</span></div>`;
+      if(modelo && !isNaN(modelo)){
+        let discrepancia= modelo - espacioMoyers;
+        let clase = discrepancia >= 0 ? 'positive' : 'negative';
+        resultado += `<div class="result-item ${clase}"><span>Discrepancia Moyers</span><span class="value-display">${discrepancia.toFixed(1)} mm</span></div>`;
+      }
+      let espacioTanaka = (suma/2) + (arcada=="Inferior"?10.5:11.0);
+      resultado += `<div class="result-item tanaka"><span>Tanaka & Johnston (${arcada})</span><span class="value-display">${espacioTanaka.toFixed(1)} mm</span></div>`;
+      if(modelo && !isNaN(modelo)){
+        let discrepancia= modelo - espacioTanaka;
+        let clase = discrepancia >= 0 ? 'positive' : 'negative';
+        resultado += `<div class="result-item ${clase}"><span>Discrepancia T&J</span><span class="value-display">${discrepancia.toFixed(1)} mm</span></div>`;
+      }
+      resultado += "</div>";
+      document.getElementById('resultados').innerHTML=resultado;
+    }
+  </script>
+</body>
+</html>
